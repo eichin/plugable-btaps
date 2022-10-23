@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import division
 from array import array
 import sys
 import datetime
@@ -12,7 +14,7 @@ else:
 # Converts badly formatted hex into decimal values.
 # Example: 0x20 becomes 20
 def bad_hex_to_dec(hexa):
-    return (int(hexa/16) * 10) + hexa % 16
+    return (int(hexa//16) * 10) + hexa % 16
 
 
 # Main BTAPS control class, represents one connection to a BTAPS device
@@ -36,7 +38,7 @@ class BTaps:
             data = self.socket.recv(length)
             return data
         except IOError as e:
-            print e
+            print(e)
             pass
 
     # Find and connect to btaddr provided when instantiating class
@@ -123,7 +125,7 @@ class BTaps:
         self.socket.send(payload)
         response = self.__recv_data()
 
-        response_bytes = memoryview(response).tolist()
+        response_bytes = buffer(response).tolist()
 
         # Failed response packet: 0xCC55020101
         if response_bytes == [0xCC, 0x55, 0x02, 0x01, 0x01]:
@@ -181,19 +183,19 @@ class BTaps:
         self.socket.send(payload)
 
         response = self.__recv_data()
-        on = memoryview(response).tolist()[7]
+        on = buffer(response).tolist()[7]
         response_list = []
 
         while True:
             response = self.__recv_data(23)
-            if memoryview(response).tolist() == [0x00]:
+            if buffer(response).tolist() == [0x00]:
                 break
             else:
                 response_list.append(response)
 
         timer_list = []
         for timer_response in response_list:
-            timer_bytes = memoryview(timer_response).tolist()
+            timer_bytes = buffer(timer_response).tolist()
             timer = BTapsTimer(timer_bytes[0], timer_response[7:])
             timer.set_repeat_days_byte(timer_bytes[1])
             timer.set_start_time(bad_hex_to_dec(timer_bytes[2]), bad_hex_to_dec(timer_bytes[3]))

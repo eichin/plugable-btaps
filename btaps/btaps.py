@@ -1,5 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
 import sys
-import libbtaps
+from . import libbtaps
 import time
 
 
@@ -14,27 +16,27 @@ def get_line():
 def print_dic_sorted(dic):
     order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     for key in sorted(dic, key=order.index):
-        print key, ":", dic[key], "",
+        print(key, ":", dic[key], "", end=' ')
 
-    print ""
+    print("")
 
 
 # Given a list of BTApsTimer objects, print them in a legible format
 def print_timers(timer_list):
-    print "Timers:"
+    print("Timers:")
     for timer in timer_list:
-        print "\tName: ", timer.name
-        print "\tID: ", timer.timer_id
-        print "\tOn: ",
+        print("\tName: ", timer.name)
+        print("\tID: ", timer.timer_id)
+        print("\tOn: ", end=' ')
         if timer.on == 1:
-            print "On"
+            print("On")
         else:
-            print "Off"
-        print "\tDays: ",
+            print("Off")
+        print("\tDays: ", end=' ')
         print_dic_sorted(timer.repeat_days)
-        print "\tStart Time: ", timer.start_time
-        print "\tEnd Time: ", timer.end_time
-        print ""
+        print("\tStart Time: ", timer.start_time)
+        print("\tEnd Time: ", timer.end_time)
+        print("")
 
 
 # Turn switch on/off
@@ -50,40 +52,40 @@ def print_status(btaps):
     name = btaps.get_dev_name()
     status = btaps.get_switch_state()
 
-    print "Name: " + name
-    print "Switch: ",
+    print("Name: " + name)
+    print("Switch: ", end=' ')
     if status[0] == 1:
-        print "On"
+        print("On")
     else:
-        print "Off"
+        print("Off")
 
     return status
 
 
 # Simple interactive command line prompts for creating new timer
 def create_timer(btaps, timer_list):
-    print "Creating New Timer:"
-    print "Name: "
+    print("Creating New Timer:")
+    print("Name: ")
     name = get_line()
     new_timer = libbtaps.BTapsTimer(len(timer_list) + 1, name)
 
-    print "Enter Start and End Time in 24-hour format (ex: 23:54)"
-    print "Start Time: "
+    print("Enter Start and End Time in 24-hour format (ex: 23:54)")
+    print("Start Time: ")
     start = get_line()
     start = time.strptime(start, "%H:%M")
     new_timer.set_start_time(start[3], start[4])
 
-    print "End Time: "
+    print("End Time: ")
     end = get_line()
     end = time.strptime(end, "%H:%M")
     new_timer.set_end_time(end[3], end[4])
 
-    print "Repeat Timer?"
+    print("Repeat Timer?")
     repeat = get_line().lower()
     if repeat == "y":
         day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         for i, day in enumerate(day_list):
-            print day, "?"
+            print(day, "?")
             repeat = get_line().lower()
             if repeat == 'y':
                 day_list[i] = True
@@ -93,7 +95,7 @@ def create_timer(btaps, timer_list):
         new_timer.set_repeat_days(day_list[0], day_list[1], day_list[2], day_list[3],
                                   day_list[4], day_list[5], day_list[6])
 
-    print "Enable New Timer? Y/N"
+    print("Enable New Timer? Y/N")
     enable = get_line().lower()
     if enable == 'y':
         new_timer.toggle_on()
@@ -103,36 +105,36 @@ def create_timer(btaps, timer_list):
 
 # Simple interactive command line prompts for modifying a timer
 def modify_timer(btaps, timer_list):
-    print "Enter Timer ID for the timer you wish to modify:"
+    print("Enter Timer ID for the timer you wish to modify:")
     id = get_line()
     mod_timer = timer_list[int(id)-1]
 
-    print "Enter values you wish to change, leave blank to keep original value"
-    print "Name: ", mod_timer.name
+    print("Enter values you wish to change, leave blank to keep original value")
+    print("Name: ", mod_timer.name)
     name = get_line()
     if name != '':
         mod_timer.set_name(name)
 
-    print "Enter Start and End Time in 24-hour format (ex: 23:54)"
-    print "Start Time: ",
+    print("Enter Start and End Time in 24-hour format (ex: 23:54)")
+    print("Start Time: ", end=' ')
     print_dic_sorted(mod_timer.start_time)
     start = get_line()
     if start != '':
         start = time.strptime(start, "%H:%M")
         mod_timer.set_start_time(start[3], start[4])
 
-    print "End Time: ", mod_timer.end_time
+    print("End Time: ", mod_timer.end_time)
     end = get_line()
     if end != '':
         end = time.strptime(end, "%H:%M")
         mod_timer.set_end_time(end[3], end[4])
 
-    print "Repeat Timer?", mod_timer.repeat_days
+    print("Repeat Timer?", mod_timer.repeat_days)
     repeat = get_line().lower()
     if repeat == "y":
         day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         for i, day in enumerate(day_list):
-            print day, "?"
+            print(day, "?")
             repeat = get_line().lower()
             if repeat == 'y':
                 day_list[i] = True
@@ -142,7 +144,7 @@ def modify_timer(btaps, timer_list):
         mod_timer.set_repeat_days(day_list[0], day_list[1], day_list[2], day_list[3],
                                   day_list[4], day_list[5], day_list[6])
 
-    print "Enable Timer? Y/N"
+    print("Enable Timer? Y/N")
     enable = get_line().lower()
     if (enable == 'y') and (mod_timer.on != 1):
         mod_timer.toggle_on()
@@ -153,10 +155,10 @@ def modify_timer(btaps, timer_list):
 
 
 def main(argv):
-    print " === Plugable PS-BTAPS CLI v0.8 ==="
+    print(" === Plugable PS-BTAPS CLI v0.8 ===")
     if len(argv) != 2:
-        print "USAGE:   python", sys.argv[0], "[Bluetooth address]"
-        print "EXAMPLE: python", sys.argv[0], "00:00:FF:FF:00:00"
+        print("USAGE:   python", sys.argv[0], "[Bluetooth address]")
+        print("EXAMPLE: python", sys.argv[0], "00:00:FF:FF:00:00")
         sys.exit(0)
 
     # Establish connection to BTAPS
@@ -169,14 +171,14 @@ def main(argv):
     print_timers(status[1])
 
     while True:
-        print "Select a function..."
-        print "1. (T)oggle Switch"
-        print "2. (C)reate Timer"
-        print "3. (M)odify Timer"
-        print "4. (D)elete Timer"
-        print "5. (S)et Device Name"
-        print "6. (G)et Switch Status (Name, On/Off, Timers)"
-        print "7. E(x)it"
+        print("Select a function...")
+        print("1. (T)oggle Switch")
+        print("2. (C)reate Timer")
+        print("3. (M)odify Timer")
+        print("4. (D)elete Timer")
+        print("5. (S)et Device Name")
+        print("6. (G)et Switch Status (Name, On/Off, Timers)")
+        print("7. E(x)it")
 
         try:
             function = get_line().lower()
@@ -189,11 +191,11 @@ def main(argv):
                 modify_timer(btaps, status[1])
             elif function in ['4', 'd']:
                 print_timers(status[1])
-                print "Enter Timer ID to delete:"
+                print("Enter Timer ID to delete:")
                 timer_id = get_line()
                 btaps.delete_timer(timer_id)
             elif function in ['5', 's']:
-                print "New Device Name:"
+                print("New Device Name:")
                 name = get_line()
                 btaps.set_dev_name(name)
             elif function in ['6', 'g']:
