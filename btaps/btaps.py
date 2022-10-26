@@ -6,7 +6,7 @@ import time
 
 
 def get_line():
-    line = raw_input('> ')
+    line = input('> ')
     if line.lower() in ('quit', 'exit', 'kill'):
         exit()
     return line
@@ -52,7 +52,7 @@ def print_status(btaps):
     name = btaps.get_dev_name()
     status = btaps.get_switch_state()
 
-    print("Name: " + name)
+    print("Name: " + str(name))
     print("Switch: ", end=' ')
     if status[0] == 1:
         print("On")
@@ -157,8 +157,8 @@ def modify_timer(btaps, timer_list):
 def main(argv):
     print(" === Plugable PS-BTAPS CLI v0.8 ===")
     if len(argv) != 2:
-        print("USAGE:   python", sys.argv[0], "[Bluetooth address]")
-        print("EXAMPLE: python", sys.argv[0], "00:00:FF:FF:00:00")
+        print("USAGE:   python3", sys.argv[0], "[Bluetooth address]")
+        print("EXAMPLE: python3", sys.argv[0], "00:00:FF:FF:00:00")
         sys.exit(0)
 
     # Establish connection to BTAPS
