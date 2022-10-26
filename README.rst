@@ -1,3 +1,43 @@
+2022-10-26 python3 port
+=======================
+
+There are a couple of other python 3 ports out there; futurize does
+90% of the work and some bytes/bytearray work covers most of the
+rest.  This one exists mostly as a place to hang an explanation of
+why, if you're having trouble with it, it's not actually anything
+wrong with btaps itself...
+
+However - if you're trying to use this code in Ubuntu 22.04, and
+especially if you're getting "Bad address" problems (or if you get as
+far as using `strace`, seeing `EFAULT` problems) it turns out that the
+version of pybluez (0.23-4build1) that shipped in ubuntu 22.04 had
+just missed python started to enforce use of `size_t` instead of `int`
+and failed outright with
+
+::
+    SystemError: PY_SSIZE_T_CLEAN macro must be defined for '#' formats
+
+0.23-5 in 22.10/kinetic has some early fixes, cherry picked from
+Debian - but they were incomplete.
+
+The right thing to do is grab pybluez 0.30 or later, those appear to
+have cleaned this up (but are not yet in ubuntu, as of kinetic.)  If
+you need to patch together something (or that's just *easier* for
+you), `apt-get source` and look at `pybluez-0.23/bluez/btmodule.c`;
+every place you find a `PyArg_ParseTuple` that takes an `&len`
+parameter, look for the misdeclaration of that `len` as `int` and
+change it to `Py_ssize_t`.  I believe just changing `sock_send` and
+`sock_sendall` were enough to get *this* package working; if you need
+more than that, go for 0.30 or later instead.
+
+Links (riddle trail):
+ - https://bugs.python.org/issue40943 caused https://github.com/pybluez/pybluez/issues/426
+ - https://github.com/pybluez/pybluez/pull/427 landed 2022-01-02 (not in 22.04)
+ - https://packages.ubuntu.com/kinetic/python3-bluez
+   - http://changelogs.ubuntu.com/changelogs/pool/universe/p/pybluez/pybluez_0.23-5/changelog
+   - https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1853933.html
+   - https://launchpad.net/~satadru-umich/+archive/ubuntu/updates/+sourcepub/13645941/+listing-archive-extra
+
 Plugable PS-BTAPS1 Library and CLI
 ==================================
 
